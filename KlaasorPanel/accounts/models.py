@@ -56,13 +56,16 @@ class CustomUser(AbstractBaseUser):
     phone_number = models.CharField(max_length=11, unique=True)
     national_id = models.CharField(max_length=10, unique=True)
     gender = models.CharField(max_length=10, choices=[("male", "Male"), ("female", "Female")])
+    birth_date = models.DateField(null=True, blank=True)
+    address = models.CharField(max_length=255, blank=True)
     
     # Team relationship
     team = models.ForeignKey(
         Team,
         on_delete=models.PROTECT,
         null=True,
-        blank=True
+        blank=True,
+        default= True
     )
     
     # Status fields
@@ -130,3 +133,14 @@ class CustomUser(AbstractBaseUser):
     @property
     def is_register_support(self):
         return self.team.role == 'REGISTER'
+    
+    
+    
+    
+    
+    class UserProfile(models.Model):
+        pass
+    
+    
+    
+    
