@@ -138,7 +138,7 @@ class CustomUser(AbstractBaseUser):
     
     
     
-    class UserProfile(models.Model):
+class UserProfile(models.Model):
         pass
     
     

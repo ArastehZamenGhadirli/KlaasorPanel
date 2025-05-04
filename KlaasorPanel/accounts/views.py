@@ -20,12 +20,27 @@ from rest_framework.permissions import (
 )
 from django_filters.rest_framework import DjangoFilterBackend # type: ignore
 from rest_framework import filters
+from accounts.models import CustomUser , Team
+from accounts.serializers import AccountsSerializer
 
 
+class CreateCustomUserView(CreateAPIView):
+    """
+    Register (signup) View For CustomUser
+    """
+    permission_classes = [AllowAny]
+    queryset = CustomUser.all()
+    #serializer_class = AccountsSerializer
 
-#Register (signup) View For CustomUser
-#Editing personal information 
-#Chnaging password 
+
+#Editing personal information view
+class UpdateCustomUSerView(UpdateAPIView):
+    pass
+#sign_in --->otp
+#sign_out 
+#sign_in --->password
+class 
+#changepassword OR forget password (newpassword , repeated password)  
 
 
 
