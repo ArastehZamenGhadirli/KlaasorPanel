@@ -158,3 +158,25 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+
+
+CELERY_ROUTES = {
+    'accounts.tasks.send_sms_to_user' : {'queue': 'celery'},
+}
+
+#CELERY_BEAT_SCHEDULE = {
+#    'check_positions': {
+#        'task': 'accounts.tasks.send_sms_to_user',
+#        'schedule': timedelta(days=1),
+#    },
+#}
+
+CELERY_BROKER_URL = 'amqp://localhost'
+
+#CACHES = {
+#    "default": {
+#        "BACKEND": "django_redis.cache.RedisCache",
+#        "LOCATION": "redis://127.0.0.1:6379/1",
+#    }
+#}

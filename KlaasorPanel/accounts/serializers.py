@@ -10,18 +10,18 @@ class AccountsSerializer(ModelSerializer):
     class Meta :
         model = CustomUser ,
         feilds = '__all__',
-        read_only_fields = ['name']
-        write_only_fields= ['password']
-
+        read_only_fields = ['phone_number']
+        write_only_fields= ['first_name','last_name','gender','birth_date','address','email','national_id']
+        
     
-    def validate(self, attrs):
-        """
-        this function is for validating the password 
-        it is used in signin view 
-        """
-        validated_data = super().validate(attrs)
-        validated_data['password']  = make_password(validated_data['password'])
-        return validated_data
+    #def validate(self, attrs):
+    #    """
+    #    this function is for validating the password 
+    #    it is used in signin view 
+    #    """
+    #    validated_data = super().validate(attrs)
+    #    validated_data['password']  = make_password(validated_data['password'])
+    #    return validated_data
     
     
     

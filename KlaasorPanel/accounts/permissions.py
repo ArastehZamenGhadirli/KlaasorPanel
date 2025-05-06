@@ -56,6 +56,9 @@ class IsTicketSupport(permissions,BasePermission):
 
 
     
+class IsNormal(permissions,BasePermission):
+    def has_permission(self,request,view):
+        return request.user.groups.filter(name='NORMAL').exists()
     
 
 
