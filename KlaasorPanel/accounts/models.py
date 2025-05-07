@@ -59,13 +59,14 @@ class CustomUser(AbstractBaseUser):
     birth_date = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=255, blank=True)
     
-    # Team relationship
+    # Team relationship (one team can have many users but one user can be member of one group)
     team = models.ForeignKey(
         Team,
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        default= True
+        default= True,
+        related_name='CustomUSer_Team'
     )
     
     # Status fields
