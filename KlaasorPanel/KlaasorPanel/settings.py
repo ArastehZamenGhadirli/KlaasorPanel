@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'Blog',
     'orders',
     'tickets',
-    'dashboard',
+    'financial',
     'rest_framework',
     'rest_framework_simplejwt',
     'phonenumber_field',
@@ -164,19 +164,24 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 CELERY_ROUTES = {
     'accounts.tasks.send_sms_to_user' : {'queue': 'celery'},
 }
+# settings.py
+KAVENEGAR_API_KEY = '2F64682F41736A4F79724B45344238584B6472557536756B556966334549373577344E427368567852614D3D'
 
-#CELERY_BEAT_SCHEDULE = {
-#    'check_positions': {
-#        'task': 'accounts.tasks.send_sms_to_user',
-#        'schedule': timedelta(days=1),
-#    },
-#}
 
-CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_BEAT_SCHEDULE = {
+    'check_positions': {
+        'task': 'accounts.tasks.send_otp_sms',
+        'schedule': timedelta(days=1),
+    },
+}
 
-#CACHES = {
-#    "default": {
-#        "BACKEND": "django_redis.cache.RedisCache",
-#        "LOCATION": "redis://127.0.0.1:6379/1",
-#    }
-#}
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1", 
+    }
+}
+
+

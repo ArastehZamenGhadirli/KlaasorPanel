@@ -35,7 +35,7 @@ class Ticket(models.Model):
     bootcamp = models.ForeignKey(
         Bootcamp,
         on_delete=models.SET_NULL,  # A ticket may or may not be related to a bootcamp.If the related Bootcamp is deleted, you don't want the ticket itself to be deleted (that would be risky).
-        null=True,
+        null= True,
         blank=True,
         related_name="Bootcamp_Ticket",
         help_text="اگر مقدار نداشته باشه، تیکت عمومی است.",
@@ -50,5 +50,15 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"Ticket #{self.id} - {self.subject}"
+
+
+class TicketMessage(models.Model):
+
+        ticket = models.ForeignKey(Ticket, related_name='Ticket_TicketMessage', on_delete=models.CASCADE)
+        sender = models.ForeignKey( settings.AUTH_USER_MODEL , related_name= 'CustomUser_Sender' , on_delete= models.CASCADE)
+        text = models.TextField(blank=True)
+        attachment = models.FileField()
+        created_at = models.DateTimeField(auto_now_add=True)
+
 
 

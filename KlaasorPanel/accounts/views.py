@@ -26,14 +26,15 @@ from accounts.serializers import AccountsSerializer, SignInSerializer, SignUpSer
 from rest_framework_simplejwt.tokens import RefreshToken  # for JWT Athutorization
 from rest_framework.response import Response
 from .permissions import (
-    IsFinacialTeam,
     IsMentor,
     IsNormal,
     IsRegisterSupport,
     IsTeacherOrMentor,
     IsTicketSupport,
 )
-
+from django.core.cache import cache
+import random
+from .tasks import send_otp_sms
 
 # complete profile view (this is when user account is created and user want to complete his/her  profile)
 class CreateCustomUserView(CreateAPIView):
@@ -42,20 +43,55 @@ class CreateCustomUserView(CreateAPIView):
     """
 
     permission_classes = [IsAuthenticated]
-    queryset = CustomUser.all()
+    queryset = CustomUser.objects.all()
     serializer_class = AccountsSerializer
 
 
 # Editing personal information view (this is when user want to edit his/her infomation)
 class UpdateCustomUSerView(UpdateAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = CustomUser.all()
+    queryset = CustomUser.objects.all()
     serializer_class = AccountsSerializer
 
 
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
 # sign_in --->otp (using celey and task.py)
 class SigInOTPView(APIView):
-    pass
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = SignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone_number = serializer.validated_data['phone_number']
+
+        otp = generate_otp()
+
+        # Save OTP in Redis (expires in 5 minutes)
+        cache.set(f"otp_{phone_number}", otp, timeout=300)
+
+        # Send via Celery task with Kavenegar
+        send_otp_sms.delay(phone_number, otp)
+
+        return Response({"message": "OTP sent via SMS"}, status=200)
+
+class VerifyOTPView(APIView):
+    def post(self, request):
+        phone = request.data.get('phone_number')
+        otp = request.data.get('otp')
+
+        cached_otp = cache.get(f"otp_{phone}")
+
+        if not cached_otp:
+            return Response({"error": "OTP expired or invalid."}, status=400)
+
+        if cached_otp != otp:
+            return Response({"error": "Invalid OTP."}, status=400)
+
+        cache.delete(f"otp_{phone}")  # Cleanup
+        return Response({"message": "OTP verified successfully"}, status=200)
+
 
 
 # sign_in --->password (any user can sign in with password)

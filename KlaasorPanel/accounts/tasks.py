@@ -1,8 +1,14 @@
 from celery import shared_task
-
-@shared_task(bind=True, default_retry_delay= 60)
-def send_sms_to_user(self,phone):
-    try :
-        message = "با سلام کد یک بار مصرف شما"
-    except Exception as e:
-        raise self.retry(exc=e, max_retries=10)
+from kavenegar import * # type: ignore
+from kavenegar import KavenegarAPI, APIException # type: ignore
+from django.conf import settings
+@shared_task
+def send_otp_sms(phone_number, otp_code):
+    try:
+        api = KavenegarAPI()  # Replace with real key
+        message = f"Your verification code is: {otp_code}"
+        params = { 'sender' : '2000660110', 'receptor': '09209201592', 'message' :'.وب سرویس پیام کوتاه کاوه نگار' }
+        response = api.sms_send(params)
+        return response
+    except APIException as e:
+        return str(e)
