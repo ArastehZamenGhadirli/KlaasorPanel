@@ -22,7 +22,7 @@ from rest_framework.permissions import (
 from django_filters.rest_framework import DjangoFilterBackend  # type: ignore
 from rest_framework import filters
 from accounts.models import CustomUser, Team
-from accounts.serializers import AccountsSerializer, SignInSerializer, SignUpSerializer
+from accounts.serializers import AccountsSerializer, SignInSerializer, SignUpSerializer , SendOTPSerializer , VerifyOTPSerializer
 from rest_framework_simplejwt.tokens import RefreshToken  # for JWT Athutorization
 from rest_framework.response import Response
 from .permissions import (
@@ -34,7 +34,7 @@ from .permissions import (
 )
 from django.core.cache import cache
 import random
-from .tasks import send_otp_sms
+from .tasks import send_sms_to_user
 
 # complete profile view (this is when user account is created and user want to complete his/her  profile)
 class CreateCustomUserView(CreateAPIView):
@@ -58,41 +58,45 @@ def generate_otp():
     return str(random.randint(100000, 999999))
 
 # sign_in --->otp (using celey and task.py)
-class SigInOTPView(APIView):
+
+class SendOTPView(APIView):
     permission_classes = [AllowAny]
 
-    def post(self, request, *args, **kwargs):
-        serializer = SignUpSerializer(data=request.data)
+    def post(self, request):
+        serializer = SendOTPSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        phone_number = serializer.validated_data['phone_number']
+        phone = serializer.validated_data['phone_number']
 
         otp = generate_otp()
 
-        # Save OTP in Redis (expires in 5 minutes)
-        cache.set(f"otp_{phone_number}", otp, timeout=300)
+        
+        send_sms_to_user.delay(phone, otp)
 
-        # Send via Celery task with Kavenegar
-        send_otp_sms.delay(phone_number, otp)
+        #  Store in Redis for 2 minutes
+        cache.set(f"otp_{phone}", otp, timeout=120)
 
-        return Response({"message": "OTP sent via SMS"}, status=200)
+        return Response({"message": "OTP sent successfully."}, status=200)
+
 
 class VerifyOTPView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        phone = request.data.get('phone_number')
-        otp = request.data.get('otp')
+        serializer = VerifyOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone = serializer.validated_data['phone_number']
+        otp = serializer.validated_data['otp']
 
-        cached_otp = cache.get(f"otp_{phone}")
+        saved_otp = cache.get(f"otp_{phone}")
 
-        if not cached_otp:
-            return Response({"error": "OTP expired or invalid."}, status=400)
+        if not saved_otp:
+            return Response({"error": "OTP expired or not found."}, status=400)
 
-        if cached_otp != otp:
+        if saved_otp != otp:
             return Response({"error": "Invalid OTP."}, status=400)
 
-        cache.delete(f"otp_{phone}")  # Cleanup
-        return Response({"message": "OTP verified successfully"}, status=200)
-
-
+        cache.delete(f"otp_{phone}")  #  Cleanup after successful verification
+        return Response({"message": "OTP verified successfully."}, status=200)
 
 # sign_in --->password (any user can sign in with password)
 class SignInWithPasswordView(APIView):

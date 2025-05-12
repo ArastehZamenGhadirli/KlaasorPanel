@@ -84,3 +84,23 @@ class SignInSerializer(ModelSerializer):
         #  for  ModelSerializer
         return CustomUser.objects.create_user(**validated_data)
     
+from rest_framework import serializers
+
+
+class SendOTPSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=15)
+
+    def validate_phone_number(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError("Phone number must contain only digits.")
+        return value
+
+
+class VerifyOTPSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=15)
+    otp = serializers.CharField(max_length=6)
+
+    def validate_otp(self, value):
+        if not value.isdigit() or len(value) != 6:
+            raise serializers.ValidationError("OTP must be a 6-digit number.")
+        return value

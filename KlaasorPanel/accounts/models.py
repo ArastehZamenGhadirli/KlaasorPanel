@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Group
 from django.core.exceptions import ValidationError
 
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields):
         if not phone_number:
@@ -15,6 +16,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         return self.create_user(phone_number, password, **extra_fields)
+
 
 class Team(models.Model):
     class TeamRole(models.TextChoices):
@@ -134,7 +136,6 @@ class CustomUser(AbstractBaseUser):
     @property
     def is_register_support(self):
         return self.team.role == 'REGISTER'
-    
     
     
     
