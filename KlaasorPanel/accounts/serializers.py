@@ -5,25 +5,15 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from rest_framework import permissions
-
+from rest_framework import serializers
 
 class AccountsSerializer(ModelSerializer):
     class Meta :
         model = CustomUser ,
-        feilds = '__all__',
-        read_only_fields = ['phone_number']
-        write_only_fields= ['first_name','last_name','gender','birth_date','address','email','national_id']
+        fields = ['phone_number','first_name','last_name','gender','birth_date','address','email','national_id']
         
-    
-    #def validate(self, attrs):
-    #    """
-    #    this function is for validating the password 
-    #    it is used in signin view 
-    #    """
-    #    validated_data = super().validate(attrs)
-    #    validated_data['password']  = make_password(validated_data['password'])
-    #    return validated_data
-    
+        
+
     
     
 class SignUpSerializer(ModelSerializer):
@@ -84,7 +74,7 @@ class SignInSerializer(ModelSerializer):
         #  for  ModelSerializer
         return CustomUser.objects.create_user(**validated_data)
     
-from rest_framework import serializers
+
 
 
 class SendOTPSerializer(serializers.Serializer):

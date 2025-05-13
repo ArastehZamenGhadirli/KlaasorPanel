@@ -24,8 +24,6 @@ class Team(models.Model):
         FINANCIAL = 'FINANCIAL', 'Financial Support'
         TICKET = 'TICKET', 'Ticket Support'
         REGISTER = 'REGISTER', 'Registration Support'
-        MENTOR = 'MENTOR', 'Mentor'
-        TEACHER = 'TEACHER', 'Teacher'
         SUPERUSER = 'SUPERUSER', 'Super User'
     
     name = models.CharField(max_length=100)
@@ -139,9 +137,7 @@ class CustomUser(AbstractBaseUser):
     
     
     
-    
-class UserProfile(models.Model):
-        pass
+
     
     
     
