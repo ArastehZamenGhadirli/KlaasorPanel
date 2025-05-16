@@ -4,13 +4,13 @@ from orders.models import Bootcamp, BootcampMembership , BootcampRegistrationReq
 from rest_framework import serializers
 
 
-class BootcampCreate(ModelSerializer):
+class BootcampCreateSerilazer(ModelSerializer):
     class Meta:
         model = Bootcamp
         fields = "__all__"
 
 
-class BootcampRegister(serializers.ModelSerializer):
+class BootcampRegisterSerilazer(serializers.ModelSerializer):
     class Meta:
         model = BootcampMembership
         fields = ["bootcamp"]
@@ -47,3 +47,5 @@ class BootcampRegistrationRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = BootcampRegistrationRequest
         fields = ['bootcamp', 'phone_number', 'email']
+
+

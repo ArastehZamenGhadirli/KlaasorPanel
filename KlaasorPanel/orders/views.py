@@ -26,6 +26,40 @@ from accounts.permissions import (
 from django.core.cache import cache
 import random
 from .models import Bootcamp , BootcampMembership , BootcampRegistrationRequest
+from rest_framework import serializers
+from .serializers import BootcampCreateSerilazer ,BootcampRegisterSerilazer ,BootcampRegistrationRequestSerializer
+from accounts.permissions import *
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAdminUser,
+    IsAuthenticatedOrReadOnly,
+    AllowAny,
+)
 # Create your views here.
+
+
+class BootcampRegisterPublicView(CreateAPIView):
+    queryset = BootcampRegistrationRequest.objects.all()
+    serializer_class = BootcampRegistrationRequestSerializer
+    permission_classes = []  # No auth required
+
+
+
+class AdminCreateBootcamp(CreateAPIView):
+    queryset = Bootcamp.objects.all()
+    serializer_class = BootcampCreateSerilazer
+    permission_classes = [
+        IsAuthenticated,
+        HasGroupPermission(['REGISTER', 'SUPERUSER'])
+    ]
+    
+
+
+
+class AdminDeleteBootcamp(DestroyAPIView):
+    pass
+
+class AdminUpdateBootcamp(UpdateAPIView):
+    pass
 
 
