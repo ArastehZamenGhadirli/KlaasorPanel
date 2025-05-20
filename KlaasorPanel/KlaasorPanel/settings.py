@@ -159,7 +159,7 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-
+DEFAULT_FROM_EMAIL = 'your_email@example.com'
 
 CELERY_ROUTES = {
     'accounts.tasks.send_sms_to_user' : {'queue': 'celery'},

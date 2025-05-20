@@ -1,10 +1,16 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from orders.models import Bootcamp, BootcampMembership , BootcampRegistrationRequest
+from orders.models import Bootcamp, BootcampMembership , BootcampRegistrationRequest , BootcampCategory
 from rest_framework import serializers
 
 
-class BootcampCreateSerilazer(ModelSerializer):
+class BootcampCategorySerialzer(ModelSerializer):
+    class Meta :
+        model = BootcampCategory
+        fields = ['id', 'name']
+
+
+class BootcampSerilazer(ModelSerializer):
     class Meta:
         model = Bootcamp
         fields = "__all__"
@@ -12,35 +18,17 @@ class BootcampCreateSerilazer(ModelSerializer):
 
 class BootcampRegisterSerilazer(serializers.ModelSerializer):
     class Meta:
-        model = BootcampMembership
-        fields = ["bootcamp"]
+        model = BootcampRegistrationRequest
+        fields = ["bootcamp", "phone_number", "email"]
 
     def validate_bootcamp(self, bootcamp):
         if bootcamp.state != Bootcamp.State.REGISTRATION:
-            raise serializers.ValidationError("Bootcamp is not open for registration.")
-        if bootcamp.capacity <= 0:
-            raise serializers.ValidationError("Bootcamp is full.")
+            raise serializers.ValidationError("بوتکمپ در وضعیت ثبت‌نام نیست.")
         return bootcamp
 
     def create(self, validated_data):
-        user = self.context["request"].user     # context give us current user
-        bootcamp = validated_data["bootcamp"]
-
-        if BootcampMembership.objects.filter(
-            user=user, bootcamp=bootcamp, role=BootcampMembership.Role.STUDENT
-        ).exists():
-            raise serializers.ValidationError(
-                "You are already registered in this bootcamp."
-            )
-
-        
-        bootcamp.capacity -= 1
-        bootcamp.save()
-
-        return BootcampMembership.objects.create(
-            user=user, bootcamp=bootcamp, role=BootcampMembership.Role.STUDENT
-        )
-
+        # فقط درخواست رو ذخیره می‌کنیم. ظرفیت دست نمی‌خوره.
+        return BootcampRegistrationRequest.objects.create(**validated_data)
 
 
 class BootcampRegistrationRequestSerializer(serializers.ModelSerializer):
@@ -49,3 +37,11 @@ class BootcampRegistrationRequestSerializer(serializers.ModelSerializer):
         fields = ['bootcamp', 'phone_number', 'email']
 
 
+class BootcampDetailSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', read_only=True)  # it will only give you more readable response 
+
+    class Meta:
+        model = Bootcamp
+        fields = ['id', 'name', 'category_name', 'start_date', 'held_days', 'held_time', 'capacity', 'state']
+        
+        
