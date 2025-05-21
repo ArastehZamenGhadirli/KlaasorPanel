@@ -26,6 +26,8 @@ class BlogPostCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = ['title', 'content', 'category', 'status']
-        
+
+
+
         
         

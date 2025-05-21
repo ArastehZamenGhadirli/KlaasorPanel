@@ -58,7 +58,7 @@ from orders.tasks import  send_registration_email , send_sms_to_user
 class BootcampRegisterPublicView(CreateAPIView):
     queryset = BootcampRegistrationRequest.objects.all()
     serializer_class = BootcampRegistrationRequestSerializer
-    permission_classes = []  # No auth required
+    permission_classes = [AllowAny]  # No auth required
 
 
 # admin create a bootcamp
