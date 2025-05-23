@@ -1,28 +1,16 @@
 from django.urls import path
 from .views import (
-    UserTransactionSummaryView,
-    InvoiceCreateView,
     InvoiceListView,
-    InvoiceDetailView,
-    OnlinePaymentView,
-    OfflinePaymentSubmissionView,
-    OfflinePaymentListView,
+    InvoiceCreateView,
+    PaymentCreateView,
+    OfflinePaymentDetailCreateView,
+    PaymentHistoryView,
 )
 
 urlpatterns = [
-    path("summary/", UserTransactionSummaryView.as_view(), name="transaction-summary"),
-    path("invoices/create/", InvoiceCreateView.as_view(), name="create-invoice"),
-    path("invoices/", InvoiceListView.as_view(), name="list-invoices"),
-    path("invoices/<int:pk>/", InvoiceDetailView.as_view(), name="invoice-detail"),
-    path("payments/online/", OnlinePaymentView.as_view(), name="online-payment"),
-    path(
-        "payments/offline/",
-        OfflinePaymentSubmissionView.as_view(),
-        name="offline-payment",
-    ),
-    path(
-        "payments/offline/list/",
-        OfflinePaymentListView.as_view(),
-        name="offline-payment-list",
-    ),
+    path('invoices/', InvoiceListView.as_view(), name='invoice-list'),
+    path('invoices/create/', InvoiceCreateView.as_view(), name='invoice-create'),
+    path('payments/create/', PaymentCreateView.as_view(), name='payment-create'),
+    path('payments/offline/', OfflinePaymentDetailCreateView.as_view(), name='offline-payment-create'),
+    path('payments/history/', PaymentHistoryView.as_view(), name='payment-history'),
 ]

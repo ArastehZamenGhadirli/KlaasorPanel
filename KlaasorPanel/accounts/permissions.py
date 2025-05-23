@@ -20,6 +20,9 @@ class HasGroupPermission(BasePermission):
             return True 
         return request.user.groups.filter(name__in=self.group_names).exists()
 
+
+
+
 class IsMentor(BasePermission):
     def has_permission(self, request, view):
         return request.user.groups.filter(name='MENTOR').exists()

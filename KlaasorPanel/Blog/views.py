@@ -63,7 +63,6 @@ class BlogPostListView(ListAPIView):
     """
     Public: Lists all published blog posts with search
     """
-
     queryset = BlogPost.objects.filter(status=BlogPost.Status.PUBLISHED)
     serializer_class = BlogPostSerializer
     permission_classes = [AllowAny]

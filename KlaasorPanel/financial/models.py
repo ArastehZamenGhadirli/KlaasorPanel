@@ -20,7 +20,7 @@ class Invoice(models.Model):
     description = models.TextField(blank=True)
     is_paid = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     def __str__(self):
         return f"Invoice #{self.id} - {self.user.email}"
 

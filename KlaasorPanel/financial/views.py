@@ -65,7 +65,7 @@ class InvoiceCreateView(CreateAPIView):
     """
     Allows register support to create a new invoice for a user.
     """
-    permission_classes = [IsAuthenticated, IsRegisterSupport]
+    permission_classes = [IsAuthenticated,IsRegisterSupport]
     serializer_class = InvoiceSerializer
     queryset = Invoice.objects.all()
 

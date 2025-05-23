@@ -6,8 +6,6 @@ from .models import Ticket
 @shared_task
 def send_ticket_notification_email(email, ticket_id):
     
-
-
     try:
         ticket = Ticket.objects.get(id=ticket_id)
         subject = f"New Ticket: {ticket.subject}"
@@ -20,3 +18,6 @@ def send_ticket_notification_email(email, ticket_id):
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
     except Ticket.DoesNotExist:
         pass
+    
+
+

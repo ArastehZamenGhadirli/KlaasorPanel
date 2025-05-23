@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Group
 from django.core.exceptions import ValidationError
-
+from django.contrib.auth.models import PermissionsMixin
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields):
@@ -48,7 +48,7 @@ class Team(models.Model):
             self.permissions_group = group
         super().save(*args, **kwargs)
 
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Core fields
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
@@ -56,8 +56,6 @@ class CustomUser(AbstractBaseUser):
     phone_number = models.CharField(max_length=11, unique=True)
     national_id = models.CharField(max_length=10, unique=True)
     gender = models.CharField(max_length=10, choices=[("male", "Male"), ("female", "Female")])
-    birth_date = models.DateField(null=True, blank=True)
-    address = models.CharField(max_length=255, blank=True)
     
     # Team relationship (one team can have many users but one user can be member of one group)
     team = models.ForeignKey(
@@ -65,12 +63,13 @@ class CustomUser(AbstractBaseUser):
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        default= True,
         related_name='CustomUSer_Team'
     )
     
     # Status fields
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)  
+    is_superuser = models.BooleanField(default=False) 
     date_joined = models.DateTimeField(auto_now_add=True)
 
     objects = CustomUserManager()
@@ -98,13 +97,9 @@ class CustomUser(AbstractBaseUser):
                 is_superuser=self.team.role == 'SUPERUSER'
             )
 
-    @property
-    def is_staff(self):
-        return hasattr(self, 'team') and self.team.role != 'NORMAL'
 
-    @property
-    def is_superuser(self):
-        return hasattr(self, 'team') and self.team.role == 'SUPERUSER'
+
+
 
     def has_perm(self, perm, obj=None):
         if self.is_superuser:
@@ -115,13 +110,6 @@ class CustomUser(AbstractBaseUser):
         return self.is_staff or self.is_superuser
 
     # Helper properties
-    @property
-    def is_mentor(self):
-        return self.team.role == 'MENTOR'
-
-    @property
-    def is_teacher(self):
-        return self.team.role == 'TEACHER'
 
     @property
     def is_financial_support(self):
